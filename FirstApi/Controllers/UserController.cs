@@ -12,9 +12,9 @@ namespace FirstApi.Controllers
     {
         // DBContext injection
         private readonly MyDbContext database;
-        public UserController(MyDbContext firstApiContext)
+        public UserController(MyDbContext database)
         {
-            this.database = firstApiContext;
+            this.database = database;
         }
 
         [HttpGet]
