@@ -20,54 +20,43 @@ namespace FirstApi.Controllers
         [HttpGet]
         public IActionResult AllUsers(int? gender)
         {
-            if(gender == null)
+            IQueryable<UserEntity> query = database.Users;  // IQueryable: rappresenta una sequenza di dati che può essere eseguita in modo remoto o locale senza specificare il tipo di dati.
+
+            if (gender.HasValue)
             {
-                List<UserEntity> users = database.Users.ToList();
-                List<UserModel> usersGenderResponses = users.Select(MapUserEntityToUserModel).ToList();
-
-                return Ok(usersGenderResponses);
-            }
-            else
-            {
-                string genderString;
-                switch (gender)
-                {
-                    case 1:
-                        genderString = "Maschio";
-                        break;
-                    case 2:
-                        genderString = "Femmina";
-                        break;
-                    case 3:
-                        genderString = "Altro";
-                        break;
-                    default:
-                        return BadRequest("Valore di genere inserito non valido");
-                }
-
-                List<UserEntity> users = database.Users.Where( user => user.Gender == gender).ToList();
-                if (users.Count == 0)
-                {
-                    return NotFound("Nessun utente trovato");
-                }
-
-                List<UserModel> usersGenderResponses = users.Select(MapUserEntityToUserModel).ToList();
-
-                return Ok(new
-                {
-                    Message = "Utenti trovati",
-                    Gender = "Genere Cercato: " + genderString,
-                    Users = usersGenderResponses
-                });
+                query = query.Where(user => user.Gender == gender.Value);
             }
 
-            
+            var usersWithWork = query  
+                .Join(  
+                    database.Works, // Tabella "lavoro" nel database
+                    user => user.WorkId,
+                    work => work.Id,
+                    (user, work) => new UserModel
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        UserName = user.UserName,
+                        Password = user.Password,
+                        EnrollmentDate = user.EnrollmentDate,
+                        Gender = GetUserGenderString(user.Gender), // Metodo statico privato per ottenere la stringa del genere
+                        WorkInfo = new WorkModel // Crea un oggetto WorkModel per il lavoro
+                        {
+                            Name = work.Name,       // Nome del lavoro dalla tabella "lavoro"
+                            Company = work.Company  // Nome dell'azienda dalla tabella "lavoro"
+                        }
+                    })
+                .ToList();
+
+            return Ok(usersWithWork);
         }
+
 
         [HttpGet("{id}")]
         public IActionResult GetUserById(int id)
         {
-            var user = database.Users.FirstOrDefault(user => user.Id == id);
+            UserEntity user = database.Users.FirstOrDefault(user => user.Id == id);
 
             if (user == null)
             {
@@ -75,7 +64,26 @@ namespace FirstApi.Controllers
             }
             else
             {
-                return Ok(MapUserEntityToUserModel(user));
+                // Ottieni il lavoro associato all'utente
+                Work work = database.Works.FirstOrDefault(w => w.Id == user.WorkId);
+                
+                // Crea un oggetto UserModel includendo le informazioni sul lavoro
+                UserModel userModel = new UserModel
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    UserName = user.UserName,
+                    Password = user.Password,
+                    EnrollmentDate = user.EnrollmentDate,
+                    Gender = GetUserGenderString(user.Gender),
+                    WorkInfo = new WorkModel
+                    {
+                        Name = work.Name,
+                        Company = work.Company
+                    }
+                };
+                return Ok(userModel);
             }
         }
 
@@ -89,65 +97,57 @@ namespace FirstApi.Controllers
                 UserName = dto.Username,
                 Password = dto.Password,
                 EnrollmentDate = dto.EnrollmentDate,
-                Gender = dto.Gender
+                Gender = dto.Gender,
+                WorkId = dto.WorkId
             };
 
             database.Users.Add(entity);
-            database.SaveChanges();  // SaveChanges() returns a Task<int> that indicates how many rows were affected by the change.
+            database.SaveChanges();  // salvataggio delle modifiche nel database
 
-            return Ok("utente aggiunto"+ entity.ToString());  // returns 201 Created response with a location header. 
+            return Ok("Utente aggiunto: "+ entity.ToString());  // returns 201 Created response with a location header. 
         }
 
         [HttpPut]
-        public async Task<HttpStatusCode> UpdateUser(UpdateUserRequest dto)
+        public IActionResult UpdateUser(UpdateUserRequest dto)
         {
-            var entity = await database.Users.FirstOrDefaultAsync(s => s.Id == dto.Id);
-            entity.FirstName = dto.FirstName;
-            entity.LastName = dto.LastName;
-            entity.UserName = dto.Username;
-            entity.Password = dto.Password;
-            entity.EnrollmentDate = dto.EnrollmentDate;
-            entity.Gender = dto.Gender;
-            await database.SaveChangesAsync();
-            return HttpStatusCode.OK;
+            var existingUser = database.Users.FirstOrDefault(user => user.Id == dto.Id);
+            if (existingUser != null)
+            {
+                existingUser.FirstName = dto.FirstName;
+                existingUser.LastName = dto.LastName;
+                existingUser.UserName = dto.Username;
+                existingUser.Password = dto.Password;
+                existingUser.EnrollmentDate = dto.EnrollmentDate;
+                existingUser.Gender = dto.Gender;
+                existingUser.WorkId = dto.WorkId;
+                database.SaveChanges();
+                return Ok("Utente aggiornato: " + existingUser.ToString() + "\n");
+            }
+            else
+            {
+                return NotFound("Utente non trovato");
+            }
         }
 
-        
         
         [HttpDelete]
         public IActionResult DeleteUser(int id)
         {
             var userToDelete = database.Users.FirstOrDefault(user => user.Id == id);
-            if (userToDelete == null)
+            if (userToDelete != null)
+            {
+                database.Users.Remove(userToDelete);
+                database.SaveChanges();
+                return Ok("Utente: " + userToDelete.ToString() + " eliminato");
+            }
+            else
             {
                 return NotFound("Utente non trovato");
             }
-
-            database.Users.Remove(userToDelete);
-            database.SaveChanges();
-
-            return Ok("Utente: "+userToDelete.ToString()+" eliminato");
-        }
-
-
-        // Maps the UserEntity to UserModel
-        private UserModel MapUserEntityToUserModel(UserEntity user)
-        {
-            string genderString = GetUserGenderString(user.Gender);
-            return new UserModel
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName,
-                Password = user.Password,
-                EnrollmentDate = user.EnrollmentDate,
-                Gender = genderString
-            };
         }
 
         // Maps the gender int to a string
-        private string GetUserGenderString(int gender)
+        private static string GetUserGenderString(int gender)
         {
             switch (gender)
             {
@@ -162,6 +162,4 @@ namespace FirstApi.Controllers
             }
         }
     }
-
-
 }

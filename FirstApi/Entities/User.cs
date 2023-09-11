@@ -18,10 +18,13 @@ public partial class UserEntity  // partial: allows to split the definition of a
     public DateTime EnrollmentDate { get; set; }
 
     public int Gender { get; set; }
+    public int WorkId { get; set; }
+
+
 
     public override string ToString()
     {
-        return $"{FirstName} {LastName} ({UserName})";
+        return $"{FirstName} {LastName} (Username: {UserName})";
     }
 
 }
@@ -35,6 +38,8 @@ public class UserModel
     public string Password { get; set; } = null!;
     public DateTime EnrollmentDate { get; set; }
     public string Gender { get; set; }  // string instead of int
+    public WorkModel WorkInfo { get; set; } // Adding Work property to UserModel
+
 
     public override string ToString()
     {

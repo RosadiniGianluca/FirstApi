@@ -16,6 +16,7 @@ public partial class MyDbContext : DbContext
     }
 
     public virtual DbSet<UserEntity> Users { get; set; }
+    public virtual DbSet<Work> Works { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { }
 
@@ -27,12 +28,22 @@ public partial class MyDbContext : DbContext
 
             entity.ToTable("user");
 
+            entity.Property(e => e.WorkId).HasColumnType("int(11)");
             entity.Property(e => e.Gender).HasColumnType("int(11)");
             entity.Property(e => e.EnrollmentDate).HasColumnType("datetime");
             entity.Property(e => e.FirstName).HasMaxLength(45);
             entity.Property(e => e.LastName).HasMaxLength(45);
             entity.Property(e => e.Password).HasMaxLength(45);
             entity.Property(e => e.UserName).HasMaxLength(45);
+            
+        });
+
+        modelBuilder.Entity<Work>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+            entity.ToTable("lavoro");
+            entity.Property(e => e.Name).HasMaxLength(45);
+            entity.Property(e => e.Company).HasMaxLength(45);
         });
 
         OnModelCreatingPartial(modelBuilder);
