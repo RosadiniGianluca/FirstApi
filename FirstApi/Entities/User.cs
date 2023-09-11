@@ -38,7 +38,7 @@ public class UserModel
     public string Password { get; set; } = null!;
     public DateTime EnrollmentDate { get; set; }
     public string Gender { get; set; }  // string instead of int
-    public WorkModel WorkInfo { get; set; } // Adding Work property to UserModel
+    public WorkModel Job { get; set; } // Adding Work property to UserModel
 
 
     public override string ToString()

@@ -41,12 +41,13 @@ namespace FirstApi.Controllers
                         Password = user.Password,
                         EnrollmentDate = user.EnrollmentDate,
                         Gender = GetUserGenderString(user.Gender), // Metodo statico privato per ottenere la stringa del genere
-                        WorkInfo = new WorkModel // Crea un oggetto WorkModel per il lavoro
+                        Job = new WorkModel // Crea un oggetto WorkModel per il lavoro
                         {
                             Name = work.Name,       // Nome del lavoro dalla tabella "lavoro"
                             Company = work.Company  // Nome dell'azienda dalla tabella "lavoro"
                         }
                     })
+                .OrderBy(user => user.Id)
                 .ToList();
 
             return Ok(usersWithWork);
@@ -77,7 +78,7 @@ namespace FirstApi.Controllers
                     Password = user.Password,
                     EnrollmentDate = user.EnrollmentDate,
                     Gender = GetUserGenderString(user.Gender),
-                    WorkInfo = new WorkModel
+                    Job = new WorkModel
                     {
                         Name = work.Name,
                         Company = work.Company
