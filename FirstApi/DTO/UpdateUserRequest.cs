@@ -1,8 +1,6 @@
 ﻿namespace FirstApi.DTO
 {
-    // DTO: Data Transfer Object (oggetto che trasferisce dati), serve per trasferire dati da una classe all'altra
-
-    public class UserDTO
+    public class UpdateUserRequest
     {
         public int Id { get; set; }
         public string? FirstName { get; set; }
