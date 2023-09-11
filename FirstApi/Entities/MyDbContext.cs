@@ -16,7 +16,7 @@ public partial class MyDbContext : DbContext
     }
 
     public virtual DbSet<UserEntity> Users { get; set; }
-    public virtual DbSet<Work> Works { get; set; }
+    public virtual DbSet<WorkEntity> Works { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { }
 
@@ -38,10 +38,10 @@ public partial class MyDbContext : DbContext
             
         });
 
-        modelBuilder.Entity<Work>(entity =>
+        modelBuilder.Entity<WorkEntity>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
-            entity.ToTable("lavoro");
+            entity.ToTable("work");
             entity.Property(e => e.Name).HasMaxLength(45);
             entity.Property(e => e.Company).HasMaxLength(45);
         });

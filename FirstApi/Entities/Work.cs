@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace FirstApi.Entities
+﻿namespace FirstApi.Entities
 {
-    public class Work
+    public class WorkEntity
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

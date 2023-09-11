@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace FirstApi.Entities;
+﻿namespace FirstApi.Entities;
 
 public partial class UserEntity  // partial: allows to split the definition of a class or a struct, or an interface over two or more source files.
 {

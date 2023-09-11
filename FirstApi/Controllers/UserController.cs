@@ -66,7 +66,7 @@ namespace FirstApi.Controllers
             else
             {
                 // Ottieni il lavoro associato all'utente
-                Work work = database.Works.FirstOrDefault(w => w.Id == user.WorkId);
+                WorkEntity work = database.Works.FirstOrDefault(w => w.Id == user.WorkId);
                 
                 // Crea un oggetto UserModel includendo le informazioni sul lavoro
                 UserModel userModel = new UserModel
