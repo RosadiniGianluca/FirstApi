@@ -1,7 +1,12 @@
-﻿namespace FirstApi.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+namespace FirstApi.Entities;
+
+[Table("user")]
 public partial class UserEntity  // partial: allows to split the definition of a class or a struct, or an interface over two or more source files.
 {
+    [Key]
     public int Id { get; set; }
 
     public string FirstName { get; set; } = null!;
@@ -15,6 +20,8 @@ public partial class UserEntity  // partial: allows to split the definition of a
     public DateTime EnrollmentDate { get; set; }
 
     public int Gender { get; set; }
+
+    [ForeignKey("WorkId")] 
     public int WorkId { get; set; }
 
 

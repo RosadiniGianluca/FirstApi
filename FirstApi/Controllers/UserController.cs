@@ -7,7 +7,7 @@ using System.Net;
 namespace FirstApi.Controllers
 {
     [ApiController]
-    [Route("FistApi/[Controller]")]
+    [Route("FirstApi/[Controller]")]
     public class UserController : ControllerBase
     {
         // DBContext injection
@@ -57,35 +57,35 @@ namespace FirstApi.Controllers
         [HttpGet("{id}")]
         public IActionResult GetUserById(int id)
         {
-            UserEntity user = database.Users.FirstOrDefault(user => user.Id == id);
+            // LINQ query: join tra le tabelle "utenti" e "lavoro" per ottenere il lavoro dell'utente
+            var userWithWork = database.Users
+                .Where(user => user.Id == id)
+                .Join(
+                    database.Works, // Tabella "works" nel database
+                    user => user.WorkId,
+                    work => work.Id,
+                    (user, work) => new UserModel
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        UserName = user.UserName,
+                        Password = user.Password,
+                        EnrollmentDate = user.EnrollmentDate,
+                        Gender = GetUserGenderString(user.Gender),
+                        Job = new WorkModel
+                        {
+                            Name = work.Name,
+                            Company = work.Company
+                        }
+                    })
+                .FirstOrDefault();
 
-            if (user == null)
+            if (userWithWork == null)
             {
                 return NotFound("Utente non trovato");
             }
-            else
-            {
-                // Ottieni il lavoro associato all'utente
-                WorkEntity work = database.Works.FirstOrDefault(w => w.Id == user.WorkId);
-                
-                // Crea un oggetto UserModel includendo le informazioni sul lavoro
-                UserModel userModel = new UserModel
-                {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    UserName = user.UserName,
-                    Password = user.Password,
-                    EnrollmentDate = user.EnrollmentDate,
-                    Gender = GetUserGenderString(user.Gender),
-                    Job = new WorkModel
-                    {
-                        Name = work.Name,
-                        Company = work.Company
-                    }
-                };
-                return Ok(userModel);
-            }
+            return Ok(userWithWork);
         }
 
         [HttpPost]
