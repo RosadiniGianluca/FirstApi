@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FirstApi.Entities
 {
-    [Table("work")]
     public class WorkEntity
     {
-        [Key]
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Company { get; set; } = null!;

@@ -20,14 +20,13 @@ public partial class MyDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { }
 
+    // Fluent API: qui si definiscono le relazioni tra le tabelle
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserEntity>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
-
             entity.ToTable("user");
-
             entity.Property(e => e.WorkId).HasColumnType("int(11)");
             entity.Property(e => e.Gender).HasColumnType("int(11)");
             entity.Property(e => e.EnrollmentDate).HasColumnType("datetime");
@@ -35,7 +34,12 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.LastName).HasMaxLength(45);
             entity.Property(e => e.Password).HasMaxLength(45);
             entity.Property(e => e.UserName).HasMaxLength(45);
-            
+
+            // Definizione della chiave esterna
+            entity.HasOne(e => e.Work)
+                .WithMany()
+                .HasForeignKey(e => e.WorkId)
+                .IsRequired(); // Specifica se la chiave esterna è obbligatoria
         });
 
         modelBuilder.Entity<WorkEntity>(entity =>
