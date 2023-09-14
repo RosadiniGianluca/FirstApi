@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers(x => x.Filters.Add<ApiKeyAuthenticationFilter>());
+builder.Services.AddControllers(/*x => x.Filters.Add<ApiKeyAuthenticationFilter>()*/);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(requirement);
 });
 
-builder.Services.AddScoped<ApiKeyAuthenticationFilter>();
+//builder.Services.AddScoped<ApiKeyAuthenticationFilter>();
 
 // Aggiungo il servizio per la connessione al database (MySQL)
 builder.Services.AddEntityFrameworkMySQL().AddDbContext<MyDbContext>(options => {
@@ -54,7 +54,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.UseMiddleware<ApiKeyAuthenticationMiddleware>();  // FIXME!
+app.UseMiddleware<ApiKeyAuthenticationMiddleware>();  // FIXME!
 
 app.UseAuthorization();
 

@@ -9,7 +9,7 @@ namespace FirstApi.Controllers
 {
     [ApiController]
     [Route("FirstApi/[Controller]")]
-    [ServiceFilter(typeof(ApiKeyAuthenticationFilter))]
+    //[ServiceFilter(typeof(ApiKeyAuthenticationFilter))]
     public class UserController : ControllerBase
     {
         // DBContext injection
