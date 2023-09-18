@@ -1,5 +1,6 @@
 using FirstApi.Authentication;
 using FirstApi.Entities;
+using FirstApi.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MySql.EntityFrameworkCore.Extensions;
@@ -56,6 +57,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();  // Middleware per la gestione delle eccezioni centralizzata (ogni eccezione viene gestita da questo middleware),
 
 //app.UseMiddleware<ApiKeyAuthenticationMiddleware>();  // Middleware per l'autenticazione tramite API Key
 

@@ -34,7 +34,7 @@ namespace FirstApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddWork(AddWorkRequest dto)
+        public IActionResult AddWork([FromBody]AddWorkRequest dto)
         {
             var entity = new WorkEntity
             {
@@ -49,7 +49,7 @@ namespace FirstApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateWork(UpdateWorkRequest dto)
+        public IActionResult UpdateWork([FromBody]UpdateWorkRequest dto)
         {
             var existingWork = database.Works.Find(dto.Id);
             if (existingWork != null)
