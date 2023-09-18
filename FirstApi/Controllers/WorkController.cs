@@ -1,4 +1,5 @@
-﻿using FirstApi.DTO;
+﻿using FirstApi.Clients;
+using FirstApi.DTO;
 using FirstApi.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,11 @@ namespace FirstApi.Controllers
         [HttpGet]
         public IActionResult AllWorks()
         {
-            var works = database.Works;
+            List<WorkEntity> works = database.Works.ToList();
+
+            var webhookClient = new WebhookClient("https://webhook.site/51f50445-72ec-4c01-89f2-847def9b122d");  // Inizializza il client del webhook
+            webhookClient.SendPostRequest(works);
+
             return Ok(works);
         }
 
