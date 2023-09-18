@@ -26,8 +26,6 @@ public partial class UserEntity  // partial: allows to split the definition of a
     public WorkEntity? Work { get; set; } // Proprietà di navigazione per la relazione
 
 
-
-
     public override string ToString()
     {
         return $"{FirstName} {LastName} (Username: {UserName})";

@@ -128,9 +128,9 @@ namespace FirstApi.Controllers
                 var existingUser = database.Users.FirstOrDefault(user => user.Id == dto.Id);
                 if (existingUser != null)
                 {
-                    existingUser.FirstName = dto.FirstName;
-                    existingUser.LastName = dto.LastName;
-                    existingUser.UserName = dto.Username;
+                    existingUser.FirstName = dto.FirstName ?? existingUser.FirstName;
+                    existingUser.LastName = dto.LastName ?? existingUser.LastName;
+                    existingUser.UserName = dto.Username ?? existingUser.UserName;
                     existingUser.Password = dto.Password;
                     existingUser.EnrollmentDate = dto.EnrollmentDate;
                     existingUser.Gender = dto.Gender;
@@ -138,10 +138,8 @@ namespace FirstApi.Controllers
                     database.SaveChanges();
                     return Ok("Utente aggiornato: " + existingUser.ToString() + "\n");
                 }
-                else
-                {
-                    return NotFound("Utente non trovato");
-                }
+                return NotFound("Utente non trovato");
+                
             }
             catch (DbUpdateConcurrencyException)
             {

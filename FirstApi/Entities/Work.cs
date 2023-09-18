@@ -8,6 +8,12 @@ namespace FirstApi.Entities
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Company { get; set; } = null!;
+        public int Salary { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name} ({Company})";
+        }
     }
 
    

@@ -48,6 +48,7 @@ public partial class MyDbContext : DbContext
             entity.ToTable("work");
             entity.Property(e => e.Name).HasMaxLength(45);
             entity.Property(e => e.Company).HasMaxLength(45);
+            entity.Property(e => e.Salary).HasMaxLength(45);
         });
 
         OnModelCreatingPartial(modelBuilder);
