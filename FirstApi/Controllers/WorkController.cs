@@ -36,6 +36,18 @@ namespace FirstApi.Controllers
         [HttpPost]
         public IActionResult AddWork([FromBody]AddWorkRequest dto)
         {
+            if (!ModelState.IsValid)
+            {
+                // Restituisci un BadRequest con gli errori di validazione
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(errors);
+            }
+
+            // Il modello è valido, procedi con l'aggiunta dell'utente
+
             var entity = new WorkEntity
             {
                 Name = dto.Name,
