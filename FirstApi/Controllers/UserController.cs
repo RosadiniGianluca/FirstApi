@@ -21,7 +21,7 @@ namespace FirstApi.Controllers
         }
 
         [HttpGet, ServiceFilter(typeof(ApiKeyAuthenticationFilter))] // Aggiunge il filtro solo a questa richiesta HTTP
-        public IActionResult AllUsers(int? gender)
+        public IActionResult AllUsers(int? gender, int? workId)
         {
             IQueryable<UserEntity> query = database.Users;  // IQueryable
 
@@ -34,6 +34,11 @@ namespace FirstApi.Controllers
                 query = query.Where(user => user.Gender == gender.Value);
             }
 
+            if (workId.HasValue)
+            {
+                query = query.Where(user => user.WorkId == workId.Value);
+            }
+
             var usersWithWork = query
                 .Include(user => user.Work)  // Caricamento anticipato dei dati del lavoro
                 .OrderBy(user => user.Id)
@@ -41,11 +46,18 @@ namespace FirstApi.Controllers
                 .Select(user => MapUserEntityToUserModel(user))
                 .ToList();  // Converti gli utenti in una lista per post Webhook
 
-            // Invia una POST con tutti gli utenti come corpo della richiesta
-            var webhookClient = new WebhookClient("https://webhook.site/51f50445-72ec-4c01-89f2-847def9b122d");
-            webhookClient.SendPostRequest(usersWithWork);
+            var webhookClient = new WebhookClient("https://webhook.site/51f50445-72ec-4c01-89f2-847def9b122d");  // Inizializza il client del webhook
 
-            return Ok(usersWithWork);
+            if (usersWithWork.Count != 0)
+            {
+                // Invia una POST con tutti gli utenti come corpo della richiesta
+                webhookClient.SendPostRequest(usersWithWork);
+                return Ok(usersWithWork);
+            }
+
+            webhookClient.SendPostRequest("Nessun utente come risultato della GET, query param non valida");  // Invia una POST con un messaggio di errore come corpo della richiesta
+            return NotFound("Nessun utente trovato");
+
         }
 
         [HttpGet("{id}")]
