@@ -7,7 +7,7 @@
         public ApiKeyAuthenticationMiddleware(RequestDelegate next, IConfiguration configuration)
         {
             _next = next;
-            _configuration = configuration;  // serve?
+            _configuration = configuration;
         }
         public async Task InvokeAsync(HttpContext context)
         {

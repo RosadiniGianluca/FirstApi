@@ -8,7 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers(/*x => x.Filters.Add<ApiKeyAuthenticationFilter>()*/);
+builder.Services.AddControllers(/*x => x.Filters.Add<ApiKeyAuthenticationFilter>()*/);  // Aggiunge il filtro a ogni controller del progetto.
+                                                                                        // In alternativa si può aggiungere il filtro solo ad alcuni controller,
+                                                                                        // ad esempio [ServiceFilter(typeof(ApiKeyAuthenticationFilter))] prima della definizione della classe del controller
+                                                                                        // oppure ad una singola richiesta HTTP, ad esempio [HttpGet, ServiceFilter(typeof(ApiKeyAuthenticationFilter))]
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -36,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(requirement);
 });
 
-//builder.Services.AddScoped<ApiKeyAuthenticationFilter>();
+builder.Services.AddScoped<ApiKeyAuthenticationFilter>();
 
 // Aggiungo il servizio per la connessione al database (MySQL)
 builder.Services.AddEntityFrameworkMySQL().AddDbContext<MyDbContext>(options => {
@@ -54,7 +57,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<ApiKeyAuthenticationMiddleware>();  // FIXME!
+//app.UseMiddleware<ApiKeyAuthenticationMiddleware>();  // Middleware per l'autenticazione tramite API Key
 
 app.UseAuthorization();
 

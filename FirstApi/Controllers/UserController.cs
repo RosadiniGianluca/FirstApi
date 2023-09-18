@@ -1,4 +1,5 @@
 ﻿using FirstApi.Authentication;
+using FirstApi.Clients;
 using FirstApi.DTO;
 using FirstApi.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace FirstApi.Controllers
 {
     [ApiController]
     [Route("FirstApi/[Controller]")]
-    //[ServiceFilter(typeof(ApiKeyAuthenticationFilter))]
+    //[ServiceFilter(typeof(ApiKeyAuthenticationFilter))] // Aggiunge il filtro ad ogni richiesta HTTP del controller
     public class UserController : ControllerBase
     {
         // DBContext injection
@@ -19,7 +20,7 @@ namespace FirstApi.Controllers
             this.database = database;
         }
 
-        [HttpGet]
+        [HttpGet, ServiceFilter(typeof(ApiKeyAuthenticationFilter))] // Aggiunge il filtro solo a questa richiesta HTTP
         public IActionResult AllUsers(int? gender)
         {
             IQueryable<UserEntity> query = database.Users;  // IQueryable
@@ -37,7 +38,12 @@ namespace FirstApi.Controllers
                 .Include(user => user.Work)  // Caricamento anticipato dei dati del lavoro
                 .OrderBy(user => user.Id)
                 .ToList()
-                .Select(user => MapUserEntityToUserModel(user));
+                .Select(user => MapUserEntityToUserModel(user))
+                .ToList();  // Converti gli utenti in una lista per post Webhook
+
+            // Invia una POST con tutti gli utenti come corpo della richiesta
+            var webhookClient = new WebhookClient("https://webhook.site/51f50445-72ec-4c01-89f2-847def9b122d");
+            webhookClient.SendPostRequest(usersWithWork);
 
             return Ok(usersWithWork);
         }
