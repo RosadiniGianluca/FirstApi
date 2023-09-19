@@ -1,4 +1,5 @@
 using FirstApi.Authentication;
+using FirstApi.Clients;
 using FirstApi.Entities;
 using FirstApi.Middleware;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,11 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(requirement);
 });
 
+// Aggiungo il servizio per l'autenticazione tramite API Key
 builder.Services.AddScoped<ApiKeyAuthenticationFilter>();
+
+// Aggiungo il servizio per il client del webhook
+builder.Services.AddScoped(x => { return new WebhookClient("https://webhook.site/51f50445-72ec-4c01-89f2-847def9b122d"); });
 
 // Aggiungo il servizio per la connessione al database (MySQL)
 builder.Services.AddEntityFrameworkMySQL().AddDbContext<MyDbContext>(options => {

@@ -11,9 +11,12 @@ namespace FirstApi.Controllers
     {
         //DBContext injection
         private readonly MyDbContext database;
-        public WorkController(MyDbContext database)
+        //WebhookClient injection
+        WebhookClient webhookClient;
+        public WorkController(MyDbContext database, WebhookClient webhookClient)
         {
             this.database = database;
+            this.webhookClient = webhookClient;
         }
 
         [HttpGet]
@@ -21,7 +24,6 @@ namespace FirstApi.Controllers
         {
             List<WorkEntity> works = database.Works.ToList();
 
-            var webhookClient = new WebhookClient("https://webhook.site/51f50445-72ec-4c01-89f2-847def9b122d");  // Inizializza il client del webhook
             webhookClient.SendPostRequest(works);
 
             return Ok(works);

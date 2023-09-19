@@ -15,15 +15,18 @@ namespace FirstApi.Controllers
     {
         // DBContext injection
         private readonly MyDbContext database;
-        public UserController(MyDbContext database)
+        // WebhookClient injection
+        private readonly WebhookClient webhookClient;   
+        public UserController(MyDbContext database, WebhookClient webhookClient)
         {
             this.database = database;
+            this.webhookClient = webhookClient;
         }
 
         [HttpGet, ServiceFilter(typeof(ApiKeyAuthenticationFilter))] // Aggiunge il filtro solo a questa richiesta HTTP
         public IActionResult AllUsers(int? gender, int? workId)
         {
-            IQueryable<UserEntity> query = database.Users;  // IQueryable
+            IQueryable<UserEntity> query = database.Users;  // IQueryable: interfaccia che rappresenta una query LINQ, ma non viene eseguita finché non viene chiamato un metodo di esecuzione (ToList(), First(), ecc.)
 
             if (gender.HasValue)
             {
@@ -40,13 +43,11 @@ namespace FirstApi.Controllers
             }
 
             var usersWithWork = query
-                .Include(user => user.Work)  // Caricamento anticipato dei dati del lavoro
+                .Include(user => user.Work) // Caricamento anticipato dei dati del lavoro (eager loading)
                 .OrderBy(user => user.Id)
                 .ToList()
                 .Select(user => MapUserEntityToUserModel(user))
-                .ToList();  // Converti gli utenti in una lista per post Webhook
-
-            var webhookClient = new WebhookClient("https://webhook.site/51f50445-72ec-4c01-89f2-847def9b122d");  // Inizializza il client del webhook
+                .ToList();                  // Converti gli utenti in una lista per post Webhook
 
             if (usersWithWork.Count != 0)
             {
@@ -57,7 +58,6 @@ namespace FirstApi.Controllers
 
             webhookClient.SendPostRequest("Nessun utente come risultato della GET, query param non valida");  // Invia una POST con un messaggio di errore come corpo della richiesta
             return NotFound("Nessun utente trovato");
-
         }
 
         [HttpGet("{id}")]
