@@ -1,8 +1,6 @@
 ﻿using FirstApi.Properties;
 using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.ServiceBus.Core;
 using Microsoft.Extensions.Options;
-using System.Text;
 
 namespace FirstApi.ServiceBus
 {
@@ -20,20 +18,27 @@ namespace FirstApi.ServiceBus
             _subscriptionClient = new SubscriptionClient(_connectionString, _topicName, _subscriptionName);
         }
 
+        // Registra un gestore di messaggi per la sottoscrizione, con un gestore di eccezioni, un numero massimo di chiamate simultanee e un valore booleano che indica se il messaggio deve essere completato automaticamente dopo la chiamata del gestore.
         public void RegisterMessageHandler(Func<Message, CancellationToken, Task> messageHandler, Func<ExceptionReceivedEventArgs, Task> exceptionHandler)
         {
-            var messageHandlerOptions = new MessageHandlerOptions(exceptionHandler)
+            var messageHandlerOptions = new MessageHandlerOptions(exceptionHandler)  // Gestore delle eccezioni
             {
-                MaxConcurrentCalls = 1,
-                AutoComplete = false
+                MaxConcurrentCalls = 1,  // Numero massimo di chiamate simultanee
+                AutoComplete = false     // Il messaggio non viene completato automaticamente dopo la chiamata del gestore
             };
-
-            _subscriptionClient.RegisterMessageHandler(messageHandler, messageHandlerOptions);
+            _subscriptionClient.RegisterMessageHandler(messageHandler, messageHandlerOptions);  // Registra il gestore dei messaggi
         }
 
+        // Completa il messaggio per rimuoverlo dalla coda
         public async Task CompleteAsync(string lockToken)
         {
-            await _subscriptionClient.CompleteAsync(lockToken);
+            await _subscriptionClient.CompleteAsync(lockToken);  // Completa il messaggio e lo rimuove dalla coda di Service Bus
+        }
+
+        // Sospende il gestore dei messaggi
+        public async Task CloseAsync()
+        {
+            await _subscriptionClient.CloseAsync();  // Sospende il gestore dei messaggi
         }
     }
 }

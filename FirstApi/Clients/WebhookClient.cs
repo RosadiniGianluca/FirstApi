@@ -52,7 +52,6 @@ namespace FirstApi.Clients
                     Console.WriteLine("Errore nell'invio del messaggio.");
                     Console.WriteLine(response.ErrorMessage);
                 }
-
                 return response;
             }
             catch(Exception ex)

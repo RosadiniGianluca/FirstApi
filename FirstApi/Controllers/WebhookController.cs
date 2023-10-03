@@ -1,5 +1,6 @@
 ﻿using FirstApi.Clients;
 using FirstApi.ServiceBus;
+using FirstApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.ServiceBus;
 using System.Text;
@@ -13,7 +14,6 @@ namespace FirstApi.Controllers
     public class WebhookController : ControllerBase
     {
         private readonly ServiceBusMessageHandler _messageHandler;
-        
         private readonly WebhookClient _webhookClient;
 
         // Dependency Injection (DI) 
@@ -23,6 +23,28 @@ namespace FirstApi.Controllers
             _webhookClient = webhookClient;
         }
 
+        
+
+
+        // Metodo che fa partire il listener interno in automatico all'avvio dell'applicazione
+        [HttpPost("startListenerInternal")]
+        public IActionResult StartListenerInternal()
+        {
+            _messageHandler.RegisterMessageHandler(ProcessMessagesAsync, ExceptionReceivedHandler);
+            return Ok("Listener internal avviato.");
+        }
+
+        // Metodo che ferma il listener interno, quello avviato all'avvio dell'applicazione
+        [HttpPost("stopListener")]
+        public async Task<IActionResult> StopListener()
+        {
+            // Sospende il gestore dei messaggi
+            await _messageHandler.CloseAsync();
+
+            return Ok("Listener sospeso.");
+        }
+
+        // FIXME: Fa partire un eccezione non gestita quando si invia la richiesta dopo che il controller è stato stoppato, da risolvere
         [HttpPost("startListener")]
         public IActionResult StartListener()
         {
