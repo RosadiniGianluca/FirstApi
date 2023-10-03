@@ -1,10 +1,13 @@
 ﻿using FirstApi.Authentication;
+using FirstApi.Properties;
 using FirstApi.Clients;
 using FirstApi.DTO;
 using FirstApi.Entities;
+using FirstApi.ServiceBus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Microsoft.Extensions.Options;
 
 namespace FirstApi.Controllers
 {
@@ -16,11 +19,15 @@ namespace FirstApi.Controllers
         // DBContext injection
         private readonly MyDbContext database;
         // WebhookClient injection
-        private readonly WebhookClient webhookClient;   
-        public UserController(MyDbContext database, WebhookClient webhookClient)
+        private readonly WebhookClient webhookClient;
+        // ServiceBusMessageHandler injection
+        private readonly ServiceBusMessageHandler _messageHandler;
+
+        public UserController(MyDbContext database, WebhookClient webhookClient, IOptions<ServiceBusConfig> serviceBusConfig)
         {
             this.database = database;
             this.webhookClient = webhookClient;
+            this._messageHandler = new ServiceBusMessageHandler(serviceBusConfig);
         }
 
         [HttpGet, ServiceFilter(typeof(ApiKeyAuthenticationFilter))] // Aggiunge il filtro solo a questa richiesta HTTP

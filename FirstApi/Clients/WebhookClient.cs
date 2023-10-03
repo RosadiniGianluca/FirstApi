@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using FirstApi.Entities;
+using RestSharp;
 
 namespace FirstApi.Clients
 {
@@ -28,6 +29,36 @@ namespace FirstApi.Clients
                 // La richiesta ha avuto esito negativo
                 Console.WriteLine("Errore nell'invio del messaggio.");
                 Console.WriteLine(response.ErrorMessage);
+            }
+        }
+
+        public async Task<RestResponse> SendMessageToWebhookAsync(WebhookMessage messageData)
+        {
+            RestRequest request = new RestRequest("/resources/", Method.Post);
+            request.AddJsonBody(messageData);
+
+            try
+            {
+                RestResponse response = await _client.ExecuteAsync(request);
+
+                if (response.IsSuccessful)
+                {
+                    // La richiesta è andata a buon fine
+                    Console.WriteLine("Messaggio inviato con successo.");
+                }
+                else
+                {
+                    // La richiesta ha avuto esito negativo
+                    Console.WriteLine("Errore nell'invio del messaggio.");
+                    Console.WriteLine(response.ErrorMessage);
+                }
+
+                return response;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Errore durante l'invio della richiesta: {ex.Message}");
+                return null;
             }
         }
     }
