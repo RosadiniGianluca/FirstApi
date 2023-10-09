@@ -23,9 +23,6 @@ namespace FirstApi.Controllers
             _webhookClient = webhookClient;
         }
 
-        
-
-
         // Metodo che fa partire il listener interno in automatico all'avvio dell'applicazione
         [HttpPost("startListenerInternal")]
         public IActionResult StartListenerInternal()

@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace FirstApi.Entities;
 
 public partial class MyDbContext : DbContext
 {
-    public MyDbContext()
-    {
-    }
-
     public MyDbContext(DbContextOptions<MyDbContext> options)
-        : base(options)
-    {
-    }
-
+        : base(options){ }
     public virtual DbSet<UserEntity> Users { get; set; }
     public virtual DbSet<WorkEntity> Works { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
